@@ -18,7 +18,7 @@ typedef struct Insertion_info
     double cost;
 } Insertion_info;
 
-std::vector<Insertion_info> Insertion_cost_calculator(Solution &s, std::vector<int> &CL, Data &data){ //revisar isso
+std::vector<Insertion_info> Insertion_cost_calculator(Solution &s, std::vector<int> &CL, Data &data){
     std::vector<Insertion_info> insertion_cost = std::vector<Insertion_info>((s.sequence.size() - 1) * CL.size());
     int l = 0;
     for (int a = 0; a < s.sequence.size()-1; a++){
@@ -41,6 +41,7 @@ void random_nodes(Solution &s, Data &data){
             s.sequence.insert(s.sequence.begin()+1, num);
         }
     }
+    // da p melhorar
     for (int i = 0; i < s.sequence.size()-1; i++){
         s.cost += data.getDistance(s.sequence[i], s.sequence[i+1]);
     }
@@ -59,6 +60,14 @@ std::vector<int> nodes_left(std::vector<int> sequence, Data &data){ // dá p mel
 void insert_solution(Solution &s, Insertion_info &insertion){
     s.sequence.insert(s.sequence.begin()+insertion.removed_edge+1, insertion.inserted_node);
     s.cost += insertion.cost;
+}
+
+void show_cost(Solution &s, Data &data){
+    double cost = 0;
+    for (int i = 0; i < s.sequence.size()-1; i++){
+        cost += data.getDistance(s.sequence[i], s.sequence[i+1]);
+    }
+    std::cout << cost << std::endl;
 }
 
 Solution Construction(Data &data){
@@ -114,7 +123,7 @@ int main(int argc, char** argv) {
 
     auto data = Data(argc, argv[1]);
     data.read();
-    size_t n = data.getDimension(); // n = distance matrix dimension
+    size_t n = data.getDimension();
 
     std::cout << "Dimension: " << n << endl;
     std::cout << "DistanceMatrix: " << endl;
@@ -126,16 +135,6 @@ int main(int argc, char** argv) {
     }
     std::cout << std::endl;
     std::cout << s.cost << std::endl;
-
-    /*std::cout << "Exemplo de Solucao s = ";
-    double cost = 0.0;
-    for (size_t i = 0; i < n - 1; i++) {
-        std::cout << i << " -> ";
-        cost += data.getDistance(i, i+1);
-    }
-    cost += data.getDistance(n, 1);
-    std::cout << n << " -> " << 1 << endl;
-    std::cout << "Custo de S: " << cost << endl;*/
 
     return 0;
 }
