@@ -110,6 +110,7 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
 }*/
 
 int main(int argc, char** argv) {
+    std::srand(std::time(NULL));
 
     auto data = Data(argc, argv[1]);
     data.read();
