@@ -70,6 +70,13 @@ void show_cost(Solution &s, Data &data){
     std::cout << cost << std::endl;
 }
 
+void show_sequence(Solution &s){
+    for (int i = 0; i < s.sequence.size()-1; i++){
+        std::cout << s.sequence[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
 Solution Construction(Data &data){
     Solution s;
     s.sequence = {0, 0};
@@ -88,15 +95,85 @@ Solution Construction(Data &data){
     return s;
 }
 
+bool best_improvement_swap(Solution &s, Data &data){
+    double best_delta = 0;
+    int best_i, best_j;
+    for (int i = 1; i < s.sequence.size()-1; i++){
+        int vi = s.sequence[i];
+        int vi_next = s.sequence[i+1];
+        int vi_prev = s.sequence[i-1];
+
+        for (int j = i+1; j < s.sequence.size()-1; j++){
+            int vj = s.sequence[j];
+            int vj_next = s.sequence[j+1];
+            int vj_prev = s.sequence[j-1];
+
+            double delta;
+
+            if (j != i+1){
+                delta = (
+                    data.getDistance(vi_prev, vj)+
+                    data.getDistance(vj, vi_next)+
+                    data.getDistance(vj_prev, vi)+
+                    data.getDistance(vi, vj_next)
+                ) - (
+                    data.getDistance(vi_prev, vi)+
+                    data.getDistance(vi, vi_next)+
+                    data.getDistance(vj_prev, vj)+
+                    data.getDistance(vj, vj_next)
+                );
+            }
+            else {
+                delta = (
+                    data.getDistance(vi_prev, vj)+
+                    data.getDistance(vi, vj_next)
+                ) - (
+                    data.getDistance(vi_prev, vi)+
+                    data.getDistance(vj, vj_next)
+                );
+            }
+            /*
+            std::cout << "\nprev_vi: " << vi_prev << "\nvi: " << vi << "\nvi_next: " << vi_next;
+            std::cout << "\nprev_vj: " << vj_prev << "\nvj: " << vj << "\nvj_next: " << vj_next;
+            std::cout << "\ndelta calculado: " << delta << std::endl;
+            */
+
+            if (delta < best_delta){
+                best_delta = delta;
+                best_i = i;
+                best_j = j;
+            }
+        }
+    }
+    if (best_delta < 0){
+        std::swap(s.sequence[best_i], s.sequence[best_j]);
+        s.cost += best_delta;
+        /*
+        show_sequence(s);
+        show_cost(s, data);
+        */
+        return true;
+    }
+    return false;
+}
+
+/*
 void Local_search(Solution &s, Data &data){
     std::vector<int> NL = {1,2,3,4,5};
     bool improved = false;
 
     while (!NL.empty()){
         int n = (rand() % NL.size()) + 1;
-        
+        switch (NL[n]){
+            case 1:
+                improved = best_improvement_swap(s, data);
+                break;
+            case 2:
+
+        }
     }
 }
+*/
 
 /*
 Solution Perturbation(Solution s);
@@ -147,6 +224,8 @@ int main(int argc, char** argv) {
     std::cout << std::endl;
     show_cost(s, data);
     std::cout << s.cost << std::endl;
+
+    best_improvement_swap(s, data);
 
     return 0;
 }
