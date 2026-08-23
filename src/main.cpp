@@ -88,7 +88,17 @@ Solution Construction(Data &data){
     return s;
 }
 
-/*void Local_search(Solution *s);
+void Local_search(Solution &s, Data &data){
+    std::vector<int> NL = {1,2,3,4,5};
+    bool improved = false;
+
+    while (!NL.empty()){
+        int n = (rand() % NL.size()) + 1;
+        
+    }
+}
+
+/*
 Solution Perturbation(Solution s);
 
 Solution ILS(int max_iter, int max_iter_ils, Data &data){
@@ -126,14 +136,16 @@ int main(int argc, char** argv) {
     size_t n = data.getDimension();
 
     std::cout << "Dimension: " << n << endl;
-    std::cout << "DistanceMatrix: " << endl;
-    data.printMatrixDist();
+    /*std::cout << "DistanceMatrix: " << endl;
+    data.printMatrixDist();*/
 
     Solution s = Construction(data);
     for (int i = 0; i <= n; i++){
         std::cout << s.sequence[i] << " ";
     }
+    
     std::cout << std::endl;
+    show_cost(s, data);
     std::cout << s.cost << std::endl;
 
     return 0;
