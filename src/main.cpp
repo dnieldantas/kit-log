@@ -196,6 +196,69 @@ bool best_improvement_2opt(Solution &s, Data &data){
     return false;
 }
 
+bool best_improvement_oropt(Solution &s, Data &data, int size_block){
+    double best_delta = 0;
+    int best_i, best_j;
+    for (int i = 1; i < s.sequence.size()-size_block; i++){
+        int vi = s.sequence[i];
+        int vi_end = s.sequence[i+size_block-1];
+        int vi_next = s.sequence[i+size_block];
+        int vi_prev = s.sequence[i-1];
+
+        for (int j = 0; j < s.sequence.size()-1; j++){
+            int vj = s.sequence[j];
+            int vj_next = s.sequence[j+1];
+
+            double delta = 0;
+
+            if (j < i-1 || j > i+size_block-1){
+                delta = (
+                    data.getDistance(vi, vj)+
+                    data.getDistance(vi_end, vj_next)+
+                    data.getDistance(vi_prev, vi_next)
+                ) - (
+                    data.getDistance(vj, vj_next)+
+                    data.getDistance(vi_end, vi_next)+
+                    data.getDistance(vi_prev, vi)
+                );
+
+                if (delta < best_delta){
+                    best_delta = delta;
+                    best_i = i;
+                    best_j = j;
+                }
+            }
+        }
+    }
+
+    if (best_delta < 0){
+        if (size_block == 1){
+            int reinserted = s.sequence[best_i];
+            s.sequence.erase(s.sequence.begin() + best_i);
+            if (best_i < best_j){
+                s.sequence.insert(s.sequence.begin() + best_j, reinserted);
+            }
+            else {
+                s.sequence.insert(s.sequence.begin() + best_j+1, reinserted);
+            }
+        }
+        else {
+            std::vector<int> reinserted(s.sequence.begin()+best_i, s.sequence.begin()+best_i+size_block);
+            s.sequence.erase(s.sequence.begin()+best_i, s.sequence.begin()+best_i+size_block);
+            if (best_i < best_j){
+                s.sequence.insert(s.sequence.begin() + best_j+1-size_block, reinserted.begin(), reinserted.end());
+            }
+            else {
+                s.sequence.insert(s.sequence.begin() + best_j+1, reinserted.begin(), reinserted.end());
+            }
+        }
+        s.cost += best_delta;
+        
+        return true;
+    }
+    return false;
+}
+
 /*
 void Local_search(Solution &s, Data &data){
     std::vector<int> NL = {1,2,3,4,5};
@@ -258,13 +321,20 @@ int main(int argc, char** argv) {
     Solution s = Construction(data);
     show_sequence(s);
     show_cost(s, data);
-
+    
     best_improvement_swap(s, data);
     show_sequence(s);
     std::cout << s.cost << std::endl;
     show_cost(s, data);
 
     best_improvement_2opt(s, data);
+    show_sequence(s);
+    std::cout << s.cost << std::endl;
+    show_cost(s, data);
+
+    int size_block = 3;
+
+    best_improvement_oropt(s, data, size_block);
     show_sequence(s);
     std::cout << s.cost << std::endl;
     show_cost(s, data);
