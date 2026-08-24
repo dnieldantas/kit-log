@@ -108,7 +108,7 @@ bool best_improvement_swap(Solution &s, Data &data){
             int vj_next = s.sequence[j+1];
             int vj_prev = s.sequence[j-1];
 
-            double delta;
+            double delta = 0;
 
             if (j != i+1){
                 delta = (
@@ -152,6 +152,45 @@ bool best_improvement_swap(Solution &s, Data &data){
         show_sequence(s);
         show_cost(s, data);
         */
+        return true;
+    }
+    return false;
+}
+
+bool best_improvement_2opt(Solution &s, Data &data){
+    double best_delta = 0;
+    int best_i, best_j;
+    for (int i = 0; i < s.sequence.size()-1; i++){
+        int vi = s.sequence[i];
+        int vi_next = s.sequence[i+1];
+
+        for (int j = i+2; j < s.sequence.size()-1; j++){
+            int vj = s.sequence[j];
+            int vj_next = s.sequence[j+1];
+
+            double delta = 0;
+
+            if (vj_next != vi){
+                delta = (
+                    data.getDistance(vi, vj)+
+                    data.getDistance(vi_next, vj_next)
+                ) - (
+                    data.getDistance(vi, vi_next)+
+                    data.getDistance(vj, vj_next)
+                );
+            }
+
+            if (delta < best_delta){
+                best_delta = delta;
+                best_i = i;
+                best_j = j;
+            }
+        }
+    }
+    if (best_delta < 0){
+        std::reverse(s.sequence.begin() + best_i+1, s.sequence.begin() + best_j+1);
+        s.cost += best_delta;
+        
         return true;
     }
     return false;
@@ -217,15 +256,28 @@ int main(int argc, char** argv) {
     data.printMatrixDist();*/
 
     Solution s = Construction(data);
+    show_sequence(s);
+    show_cost(s, data);
+
+    best_improvement_swap(s, data);
+    show_sequence(s);
+    std::cout << s.cost << std::endl;
+    show_cost(s, data);
+
+    best_improvement_2opt(s, data);
+    show_sequence(s);
+    std::cout << s.cost << std::endl;
+    show_cost(s, data);
+
+/*
     for (int i = 0; i <= n; i++){
         std::cout << s.sequence[i] << " ";
     }
-    
+
     std::cout << std::endl;
     show_cost(s, data);
     std::cout << s.cost << std::endl;
-
-    best_improvement_swap(s, data);
+*/
 
     return 0;
 }
