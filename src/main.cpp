@@ -316,6 +316,7 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
                 iter_ils = 0;
             }
             //s = Perturbation(best);
+            s = best;
             iter_ils++;
         }
         if (best.cost < best_of_all.cost){
@@ -336,6 +337,21 @@ int main(int argc, char** argv) {
     /*std::cout << "DistanceMatrix: " << endl;
     data.printMatrixDist();*/
 
+    int max_iter_ils;
+    if (n >= 150){
+        max_iter_ils = n/2;
+    }
+    else {
+        max_iter_ils = n;
+    }
+
+    Solution s = ILS(50, max_iter_ils, data);
+
+    show_sequence(s);
+    std::cout << s.cost << std::endl;
+    show_cost(s, data);
+
+    /*
     Solution s = Construction(data);
     show_sequence(s);
     show_cost(s, data);
@@ -344,6 +360,7 @@ int main(int argc, char** argv) {
     show_sequence(s);
     std::cout << s.cost << std::endl;
     show_cost;
+    */
 
 /*
     for (int i = 0; i <= n; i++){
