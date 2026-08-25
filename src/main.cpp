@@ -259,7 +259,7 @@ bool best_improvement_oropt(Solution &s, Data &data, int size_block){
     return false;
 }
 
-/*
+
 void Local_search(Solution &s, Data &data){
     std::vector<int> NL = {1,2,3,4,5};
     bool improved = false;
@@ -271,14 +271,32 @@ void Local_search(Solution &s, Data &data){
                 improved = best_improvement_swap(s, data);
                 break;
             case 2:
+                improved = best_improvement_2opt(s, data);
+                break;
+            case 3:
+                improved = best_improvement_oropt(s, data, 1);
+                break;
+            case 4:
+                improved = best_improvement_oropt(s, data, 2);
+                break;
+            case 5:
+                improved = best_improvement_oropt(s, data, 3);
+                break;
+        }
 
+        if (improved){
+            NL = {1, 2, 3, 4, 5};
+        }
+        else {
+            NL.erase(NL.begin() + n-1);
         }
     }
 }
-*/
+
 
 /*
 Solution Perturbation(Solution s);
+*/
 
 Solution ILS(int max_iter, int max_iter_ils, Data &data){
     Solution best_of_all;
@@ -292,12 +310,12 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
 
         while (iter_ils <= max_iter_ils)
         {
-            Local_search(&s);
+            Local_search(s, data);
             if (s.cost < best.cost){
                 best = s;
                 iter_ils = 0;
             }
-            s = Perturbation(best);
+            //s = Perturbation(best);
             iter_ils++;
         }
         if (best.cost < best_of_all.cost){
@@ -305,7 +323,7 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
         }
     }
     return best_of_all;
-}*/
+}
 
 int main(int argc, char** argv) {
     std::srand(std::time(NULL));
@@ -322,22 +340,10 @@ int main(int argc, char** argv) {
     show_sequence(s);
     show_cost(s, data);
     
-    best_improvement_swap(s, data);
+    Local_search(s, data);
     show_sequence(s);
     std::cout << s.cost << std::endl;
-    show_cost(s, data);
-
-    best_improvement_2opt(s, data);
-    show_sequence(s);
-    std::cout << s.cost << std::endl;
-    show_cost(s, data);
-
-    int size_block = 3;
-
-    best_improvement_oropt(s, data, size_block);
-    show_sequence(s);
-    std::cout << s.cost << std::endl;
-    show_cost(s, data);
+    show_cost;
 
 /*
     for (int i = 0; i <= n; i++){
