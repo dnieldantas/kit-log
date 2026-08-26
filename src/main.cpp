@@ -81,8 +81,18 @@ Solution Construction(Data &data){
     Solution s;
     s.sequence = {0, 0};
     random_nodes(s, data);
+
+    /*std::cout << "Sequencia inicial com random_nodes: ";
+    show_sequence(s);
+    std::cout << "Custo com random_nodes: ";
+    show_cost(s, data);*/
     
     std::vector<int> CL = nodes_left(s.sequence, data);
+    /*std::cout << "nodes_left: ";
+    for (int i : CL){
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;*/
 
     while (!CL.empty()){
         std::vector<Insertion_info> insertion_cost = Insertion_cost_calculator(s, CL, data);
@@ -265,7 +275,8 @@ void Local_search(Solution &s, Data &data){
     bool improved = false;
 
     while (!NL.empty()){
-        int n = (rand() % NL.size()) + 1;
+        int n = (rand() % NL.size());
+
         switch (NL[n]){
             case 1:
                 improved = best_improvement_swap(s, data);
@@ -288,7 +299,7 @@ void Local_search(Solution &s, Data &data){
             NL = {1, 2, 3, 4, 5};
         }
         else {
-            NL.erase(NL.begin() + n-1);
+            NL.erase(NL.begin() + n);
         }
     }
 }
@@ -389,9 +400,12 @@ int main(int argc, char** argv) {
     size_t n = data.getDimension();
 
     std::cout << "Dimension: " << n << endl;
+
+    Solution s = Construction(data);
+
     /*std::cout << "DistanceMatrix: " << endl;
     data.printMatrixDist();*/
-
+/*
     int max_iter_ils;
     if (n >= 150){
         max_iter_ils = n/2;
@@ -405,6 +419,7 @@ int main(int argc, char** argv) {
     show_sequence(s);
     std::cout << s.cost << std::endl;
     show_cost(s, data);
+    */
 /*
     Solution s = Construction(data);
 
