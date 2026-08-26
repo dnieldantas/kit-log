@@ -293,10 +293,66 @@ void Local_search(Solution &s, Data &data){
     }
 }
 
+int rand_range(int min, int max){
+    return (rand() % (max+1-min))+min;
+}
 
-/*
-Solution Perturbation(Solution s);
-*/
+Solution Perturbation(Solution &a, Data &data){
+    Solution s = a;
+    
+    int max_size = (int) std::ceil((s.sequence.size()-1)/10.0);
+    int first_i, last_i, first_j, last_j;
+
+    int size_block_i = rand_range(2, max_size);
+    int size_block_j = rand_range(2, max_size);
+
+    first_i = rand_range(1, (s.sequence.size()-2)-(size_block_i-1)-(size_block_j));
+    last_i = first_i+size_block_i-1;
+
+    first_j = rand_range(last_i+1, (s.sequence.size()-2)-(size_block_j-1));
+    last_j = first_j+size_block_j-1;
+
+    double delta;
+
+    if (last_i+1 != first_j){
+        delta = (
+            data.getDistance(s.sequence[first_i-1], s.sequence[first_j])+
+            data.getDistance(s.sequence[first_j-1], s.sequence[first_i])+
+            data.getDistance(s.sequence[last_j], s.sequence[last_i+1])+
+            data.getDistance(s.sequence[last_i], s.sequence[last_j+1])
+        ) - (
+            data.getDistance(s.sequence[first_i-1], s.sequence[first_i])+
+            data.getDistance(s.sequence[first_j-1], s.sequence[first_j])+
+            data.getDistance(s.sequence[last_i], s.sequence[last_i+1])+
+            data.getDistance(s.sequence[last_j], s.sequence[last_j+1])
+        );
+    }
+    else {
+        delta = (
+            data.getDistance(s.sequence[first_i-1], s.sequence[first_j])+
+            data.getDistance(s.sequence[last_j], s.sequence[first_i])+
+            data.getDistance(s.sequence[last_i], s.sequence[last_j+1])
+        ) - (
+            data.getDistance(s.sequence[first_i-1], s.sequence[first_i])+
+            data.getDistance(s.sequence[first_j-1], s.sequence[first_j])+
+            data.getDistance(s.sequence[last_j], s.sequence[last_j+1])
+        );
+    }
+
+    std::vector<int> block_i(s.sequence.begin() + first_i, s.sequence.begin() + last_i+1);
+    std::vector<int> block_j(s.sequence.begin() + first_j, s.sequence.begin() + last_j+1);
+
+    s.sequence.erase(s.sequence.begin()+first_j, s.sequence.begin()+last_j+1);
+    s.sequence.erase(s.sequence.begin()+first_i, s.sequence.begin()+last_i+1);
+
+    s.sequence.insert(s.sequence.begin()+first_j-size_block_i, block_i.begin(), block_i.end());
+    s.sequence.insert(s.sequence.begin()+first_i, block_j.begin(), block_j.end());
+
+    s.cost += delta;
+
+    return s;
+}
+
 
 Solution ILS(int max_iter, int max_iter_ils, Data &data){
     Solution best_of_all;
@@ -315,8 +371,7 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
                 best = s;
                 iter_ils = 0;
             }
-            //s = Perturbation(best);
-            s = best;
+            s = Perturbation(best, data);
             iter_ils++;
         }
         if (best.cost < best_of_all.cost){
@@ -337,7 +392,7 @@ int main(int argc, char** argv) {
     /*std::cout << "DistanceMatrix: " << endl;
     data.printMatrixDist();*/
 
-    int max_iter_ils;
+    /*int max_iter_ils;
     if (n >= 150){
         max_iter_ils = n/2;
     }
@@ -345,7 +400,15 @@ int main(int argc, char** argv) {
         max_iter_ils = n;
     }
 
-    Solution s = ILS(50, max_iter_ils, data);
+    Solution s = ILS(50, max_iter_ils, data);*/
+
+    Solution s = Construction(data);
+
+    show_sequence(s);
+    std::cout << s.cost << std::endl;
+    show_cost(s, data);
+
+    s = Perturbation(s, data);
 
     show_sequence(s);
     std::cout << s.cost << std::endl;
