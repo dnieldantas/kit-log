@@ -392,7 +392,7 @@ int main(int argc, char** argv) {
     /*std::cout << "DistanceMatrix: " << endl;
     data.printMatrixDist();*/
 
-    /*int max_iter_ils;
+    int max_iter_ils;
     if (n >= 150){
         max_iter_ils = n/2;
     }
@@ -400,8 +400,12 @@ int main(int argc, char** argv) {
         max_iter_ils = n;
     }
 
-    Solution s = ILS(50, max_iter_ils, data);*/
+    Solution s = ILS(50, max_iter_ils, data);
 
+    show_sequence(s);
+    std::cout << s.cost << std::endl;
+    show_cost(s, data);
+/*
     Solution s = Construction(data);
 
     show_sequence(s);
@@ -412,7 +416,7 @@ int main(int argc, char** argv) {
 
     show_sequence(s);
     std::cout << s.cost << std::endl;
-    show_cost(s, data);
+    show_cost(s, data);*/
 
     /*
     Solution s = Construction(data);
