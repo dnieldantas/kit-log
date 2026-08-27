@@ -116,6 +116,62 @@ Solution Construction(Data &data){
     return s;
 }
 
+bool check_delta(Solution &s, Data &data, int move, int i, int j, double delta, int size_block){
+    Solution a = s;
+    double cost = 0;
+
+    switch (move){
+    case 1:{
+        std::swap(a.sequence[i], a.sequence[j]);
+        for (int k = 0; k < a.sequence.size()-1; k++){
+            cost += data.getDistance(a.sequence[k], a.sequence[k+1]);
+        }
+        double real_delta = cost - a.cost;
+        return real_delta == delta;
+        break;
+    }
+    case 2:{
+        std::reverse(a.sequence.begin() + i+1, a.sequence.begin() + j+1);
+        for (int k = 0; k < a.sequence.size()-1; k++){
+            cost += data.getDistance(a.sequence[k], a.sequence[k+1]);
+        }
+        double real_delta = cost - a.cost;
+        return real_delta == delta;
+        break;
+    }
+    case 3:{
+        if (size_block == 1){
+            int reinserted = a.sequence[i];
+            a.sequence.erase(a.sequence.begin() + i);
+            if (i < j){
+                a.sequence.insert(a.sequence.begin() + j, reinserted);
+            }
+            else {
+                a.sequence.insert(a.sequence.begin() + j+1, reinserted);
+            }
+        }
+        else {
+            std::vector<int> reinserted(a.sequence.begin()+ i, a.sequence.begin()+i+size_block);
+            a.sequence.erase(a.sequence.begin()+i, a.sequence.begin()+i+size_block);
+            if (i < j){
+                a.sequence.insert(a.sequence.begin() + j+1-size_block, reinserted.begin(), reinserted.end());
+            }
+            else {
+                a.sequence.insert(a.sequence.begin() + j+1, reinserted.begin(), reinserted.end());
+            }
+        }
+        for (int k = 0; k < a.sequence.size()-1; k++){
+            cost += data.getDistance(a.sequence[k], a.sequence[k+1]);
+        }
+        double real_delta = cost - a.cost;
+        return real_delta == delta;
+        break;
+    }
+    default:
+        return false;
+    }
+}
+
 bool best_improvement_swap(Solution &s, Data &data){
     double best_delta = 0;
     int best_i = 0;
@@ -150,6 +206,7 @@ bool best_improvement_swap(Solution &s, Data &data){
                     data.getDistance(vj_prev, vj)+
                     data.getDistance(vj, vj_next)
                 );
+                
             }
             else {
                 delta = (
@@ -160,11 +217,14 @@ bool best_improvement_swap(Solution &s, Data &data){
                     data.getDistance(vj, vj_next)
                 );
             }
+
+            std::cout << "SWAP: " << check_delta(s, data, 1, i, j, delta, 0) << " ";
             /*
             std::cout << "\nprev_vi: " << vi_prev << "\nvi: " << vi << "\nvi_next: " << vi_next;
             std::cout << "\nprev_vj: " << vj_prev << "\nvj: " << vj << "\nvj_next: " << vj_next;
             */
             // std::cout << "\nDelta calculado (swap): " << delta << std::endl;
+
 
             if (delta < best_delta){
                 best_delta = delta;
@@ -219,6 +279,8 @@ bool best_improvement_2opt(Solution &s, Data &data){
                     data.getDistance(vj, vj_next)
                 );
             }
+
+            std::cout << "2-OPT: " << check_delta(s, data, 2, i, j, delta, 0) << " ";
 
             // std::cout << "\nDelta calculado (2opt): " << delta << std::endl;
 
@@ -279,6 +341,8 @@ bool best_improvement_oropt(Solution &s, Data &data, int size_block){
                     data.getDistance(vi_end, vi_next)+
                     data.getDistance(vi_prev, vi)
                 );
+
+                std::cout << "OR-OPT: " << check_delta(s, data, 3, i, j, delta, size_block) << " ";
 
                 // std::cout << "\nDelta calculado (oropt): " << delta << std::endl;
 
@@ -371,7 +435,7 @@ Solution Perturbation(Solution &a, Data &data){
     
     int max_size = (int) std::ceil((s.sequence.size()-1)/10.0);
 
-    //std::cout << "max_size (perturbation): " << max_size << std::endl;
+    // std::cout << "max_size (perturbation): " << max_size << std::endl;
 
     int size_block_i = rand_range(2, max_size);
     int size_block_j = rand_range(2, max_size);
@@ -435,14 +499,14 @@ Solution Perturbation(Solution &a, Data &data){
     s.sequence.erase(s.sequence.begin()+first_j, s.sequence.begin()+last_j+1);
     s.sequence.erase(s.sequence.begin()+first_i, s.sequence.begin()+last_i+1);
 
-    std::cout << "sequence after erase (perturbation): ";
-    show_sequence(s);
+    // std::cout << "sequence after erase (perturbation): ";
+    // show_sequence(s);
 
     s.sequence.insert(s.sequence.begin()+first_j-size_block_i, block_i.begin(), block_i.end());
     s.sequence.insert(s.sequence.begin()+first_i, block_j.begin(), block_j.end());
 
-    std::cout << "sequence after insertion (perturbation): ";
-    show_sequence(s);
+    // std::cout << "sequence after insertion (perturbation): ";
+    // show_sequence(s);
 
     s.cost += delta;
 
@@ -519,10 +583,6 @@ int main(int argc, char** argv) {
 
     std::cout << "Dimension: " << n << endl;
 
-
-    /*std::cout << "DistanceMatrix: " << endl;
-    data.printMatrixDist();*/
-
     int max_iter_ils;
     if (n >= 150){
         max_iter_ils = n/2;
@@ -535,43 +595,20 @@ int main(int argc, char** argv) {
 
     show_sequence(s);
     std::cout << s.cost << std::endl;
-    show_cost(s, data);
+    show_cost(s, data); 
 
-    
-/*
-    Solution s = Construction(data);
+    // Solution s = Construction(data);
 
-    show_sequence(s);
-    std::cout << s.cost << std::endl;
-    show_cost(s, data);
+    // show_sequence(s);
+    // std::cout << s.cost << std::endl;
+    // show_cost(s, data);
 
-    best_improvement_swap(s, data);
-
-    show_sequence(s);
-    std::cout << s.cost << std::endl;
-    show_cost(s, data);
-*/
-
-    /*
-    Solution s = Construction(data);
-    show_sequence(s);
-    show_cost(s, data);
-    
-    Local_search(s, data);
-    show_sequence(s);
-    std::cout << s.cost << std::endl;
-    show_cost;
-    */
-
-/*
-    for (int i = 0; i <= n; i++){
-        std::cout << s.sequence[i] << " ";
-    }
+    // best_improvement_swap(s, data);
 
     std::cout << std::endl;
-    show_cost(s, data);
+    show_sequence(s);
     std::cout << s.cost << std::endl;
-*/
+    show_cost(s, data);
 
     return 0;
 }
