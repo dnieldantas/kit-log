@@ -71,7 +71,7 @@ void show_cost(Solution &s, Data &data){
 }
 
 void show_sequence(Solution &s){
-    for (int i = 0; i < s.sequence.size()-1; i++){
+    for (int i = 0; i < s.sequence.size(); i++){
         std::cout << s.sequence[i] << " ";
     }
     std::cout << std::endl;
@@ -82,17 +82,17 @@ Solution Construction(Data &data){
     s.sequence = {0, 0};
     random_nodes(s, data);
 
-    /*std::cout << "Sequencia inicial com random_nodes: ";
-    show_sequence(s);
-    std::cout << "Custo com random_nodes: ";
-    show_cost(s, data);*/
+    // std::cout << "Sequencia inicial com random_nodes: ";
+    // show_sequence(s);
+    // std::cout << "Custo com random_nodes: ";
+    // show_cost(s, data);
     
     std::vector<int> CL = nodes_left(s.sequence, data);
-    /*std::cout << "nodes_left: ";
-    for (int i : CL){
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;*/
+    // std::cout << "nodes_left: ";
+    // for (int i : CL){
+    //     std::cout << i << " ";
+    // }
+    // std::cout << std::endl;
 
     while (!CL.empty()){
         std::vector<Insertion_info> insertion_cost = Insertion_cost_calculator(s, CL, data);
@@ -100,23 +100,41 @@ Solution Construction(Data &data){
         double alpha = (double) rand() / RAND_MAX;
         int selected = rand() % ((int) ceil(alpha * insertion_cost.size()));
         insert_solution(s, insertion_cost[selected]);
+        
+        // std::cout << "Sequencia depois da insertion: ";
+        // show_sequence(s);
+        // std::cout << "Custo com a insertion: ";
+        // show_cost(s, data);
+
         CL = nodes_left(s.sequence, data);
+
+        // std::cout << "nodes_left: ";
+        // for (int i : CL){
+        //     std::cout << i << " ";
+        // }
     }
     return s;
 }
 
 bool best_improvement_swap(Solution &s, Data &data){
     double best_delta = 0;
-    int best_i, best_j;
+    int best_i = 0;
+    int best_j = 0;
     for (int i = 1; i < s.sequence.size()-1; i++){
         int vi = s.sequence[i];
         int vi_next = s.sequence[i+1];
         int vi_prev = s.sequence[i-1];
 
+        // std::cout << "Vértices i (swap):\n";
+        // std::cout << vi_prev << " " << vi << " " << vi_next << "\n";
+
         for (int j = i+1; j < s.sequence.size()-1; j++){
             int vj = s.sequence[j];
             int vj_next = s.sequence[j+1];
             int vj_prev = s.sequence[j-1];
+
+            // std::cout << "Vértices j (swap):\n";
+            // std::cout << vj_prev << " " << vj << " " << vj_next << "\n";
 
             double delta = 0;
 
@@ -145,23 +163,28 @@ bool best_improvement_swap(Solution &s, Data &data){
             /*
             std::cout << "\nprev_vi: " << vi_prev << "\nvi: " << vi << "\nvi_next: " << vi_next;
             std::cout << "\nprev_vj: " << vj_prev << "\nvj: " << vj << "\nvj_next: " << vj_next;
-            std::cout << "\ndelta calculado: " << delta << std::endl;
             */
+            // std::cout << "\nDelta calculado (swap): " << delta << std::endl;
 
             if (delta < best_delta){
                 best_delta = delta;
                 best_i = i;
                 best_j = j;
             }
+
+            // std::cout << "\nMelhor Delta (swap): " << best_delta << std::endl;
+            // std::cout << "\nMelhor i (swap): " << best_i << std::endl;
+            // std::cout << "\nMelhor j (swap): " << best_j << std::endl;
         }
     }
     if (best_delta < 0){
         std::swap(s.sequence[best_i], s.sequence[best_j]);
         s.cost += best_delta;
-        /*
-        show_sequence(s);
-        show_cost(s, data);
-        */
+        
+        // show_sequence(s);
+        // std::cout << s.cost << std::endl;
+        // show_cost(s, data);
+        
         return true;
     }
     return false;
@@ -169,14 +192,21 @@ bool best_improvement_swap(Solution &s, Data &data){
 
 bool best_improvement_2opt(Solution &s, Data &data){
     double best_delta = 0;
-    int best_i, best_j;
+    int best_i = 0; 
+    int best_j = 0;
     for (int i = 0; i < s.sequence.size()-1; i++){
         int vi = s.sequence[i];
         int vi_next = s.sequence[i+1];
 
+        // std::cout << "Vértices i (2opt):\n";
+        // std::cout << vi << " " << vi_next << "\n";
+
         for (int j = i+2; j < s.sequence.size()-1; j++){
             int vj = s.sequence[j];
             int vj_next = s.sequence[j+1];
+
+            // std::cout << "Vértices j (2opt):\n";
+            // std::cout << vj << " " << vj_next << "\n";
 
             double delta = 0;
 
@@ -190,16 +220,27 @@ bool best_improvement_2opt(Solution &s, Data &data){
                 );
             }
 
+            // std::cout << "\nDelta calculado (2opt): " << delta << std::endl;
+
             if (delta < best_delta){
                 best_delta = delta;
                 best_i = i;
                 best_j = j;
             }
+
+            // std::cout << "\nMelhor Delta (2opt): " << best_delta << std::endl;
+            // std::cout << "\nMelhor i (2opt): " << best_i << std::endl;
+            // std::cout << "\nMelhor j (2opt): " << best_j << std::endl;
+            
         }
     }
     if (best_delta < 0){
         std::reverse(s.sequence.begin() + best_i+1, s.sequence.begin() + best_j+1);
         s.cost += best_delta;
+
+        // show_sequence(s);
+        // std::cout << s.cost << std::endl;
+        // show_cost(s, data);
         
         return true;
     }
@@ -208,16 +249,23 @@ bool best_improvement_2opt(Solution &s, Data &data){
 
 bool best_improvement_oropt(Solution &s, Data &data, int size_block){
     double best_delta = 0;
-    int best_i, best_j;
+    int best_i = 0;
+    int best_j = 0;
     for (int i = 1; i < s.sequence.size()-size_block; i++){
         int vi = s.sequence[i];
         int vi_end = s.sequence[i+size_block-1];
         int vi_next = s.sequence[i+size_block];
         int vi_prev = s.sequence[i-1];
 
+        // std::cout << "Vértices i (oropt):\n";
+        // std::cout << vi_prev << " " << vi << " " << vi_next << "\n";
+
         for (int j = 0; j < s.sequence.size()-1; j++){
             int vj = s.sequence[j];
             int vj_next = s.sequence[j+1];
+
+            // std::cout << "Vértices j (oropt):\n";
+            // std::cout << vj << " " << vi_next << "\n";
 
             double delta = 0;
 
@@ -232,11 +280,17 @@ bool best_improvement_oropt(Solution &s, Data &data, int size_block){
                     data.getDistance(vi_prev, vi)
                 );
 
+                // std::cout << "\nDelta calculado (oropt): " << delta << std::endl;
+
                 if (delta < best_delta){
                     best_delta = delta;
                     best_i = i;
                     best_j = j;
                 }
+
+                // std::cout << "\nMelhor Delta (oropt): " << best_delta << std::endl;
+                // std::cout << "\nMelhor i (oropt): " << best_i << std::endl;
+                // std::cout << "\nMelhor j (oropt): " << best_j << std::endl;
             }
         }
     }
@@ -263,6 +317,10 @@ bool best_improvement_oropt(Solution &s, Data &data, int size_block){
             }
         }
         s.cost += best_delta;
+
+        // show_sequence(s);
+        // std::cout << s.cost << std::endl;
+        // show_cost(s, data);
         
         return true;
     }
@@ -312,18 +370,25 @@ Solution Perturbation(Solution &a, Data &data){
     Solution s = a;
     
     int max_size = (int) std::ceil((s.sequence.size()-1)/10.0);
-    int first_i, last_i, first_j, last_j;
+
+    //std::cout << "max_size (perturbation): " << max_size << std::endl;
 
     int size_block_i = rand_range(2, max_size);
     int size_block_j = rand_range(2, max_size);
 
-    first_i = rand_range(1, (s.sequence.size()-2)-(size_block_i-1)-(size_block_j));
-    last_i = first_i+size_block_i-1;
+    // std::cout << "size_block_i: " << size_block_i << "\nsize_block_j: " << size_block_j << "\n";
 
-    first_j = rand_range(last_i+1, (s.sequence.size()-2)-(size_block_j-1));
-    last_j = first_j+size_block_j-1;
+    int first_i = rand_range(1, (s.sequence.size()-2)-(size_block_i-1)-(size_block_j));
+    int last_i = first_i+size_block_i-1;
 
-    double delta;
+    // std::cout << "first_i: " << first_i << "\nlast_i: " << last_i << "\n";
+    
+    int first_j = rand_range(last_i+1, (s.sequence.size()-2)-(size_block_j-1));
+    int last_j = first_j+size_block_j-1;
+
+    // std::cout << "first_j: " << first_j << "\nlast_j: " << last_j << "\n";
+
+    double delta = 0;
 
     if (last_i+1 != first_j){
         delta = (
@@ -350,16 +415,40 @@ Solution Perturbation(Solution &a, Data &data){
         );
     }
 
+    // std::cout << "\nDelta calculado (perturbation): " << delta << std::endl;
+
     std::vector<int> block_i(s.sequence.begin() + first_i, s.sequence.begin() + last_i+1);
     std::vector<int> block_j(s.sequence.begin() + first_j, s.sequence.begin() + last_j+1);
+
+    // std::cout << "block_i: ";
+    // for (int i : block_i){
+    //     std::cout << i << " ";
+    // }
+    // std::cout << std::endl;
+
+    // std::cout << "block_j: ";
+    // for (int j : block_j){
+    //     std::cout << j << " ";
+    // }
+    // std::cout << std::endl;
 
     s.sequence.erase(s.sequence.begin()+first_j, s.sequence.begin()+last_j+1);
     s.sequence.erase(s.sequence.begin()+first_i, s.sequence.begin()+last_i+1);
 
+    std::cout << "sequence after erase (perturbation): ";
+    show_sequence(s);
+
     s.sequence.insert(s.sequence.begin()+first_j-size_block_i, block_i.begin(), block_i.end());
     s.sequence.insert(s.sequence.begin()+first_i, block_j.begin(), block_j.end());
 
+    std::cout << "sequence after insertion (perturbation): ";
+    show_sequence(s);
+
     s.cost += delta;
+
+    // show_sequence(s);
+    // std::cout << s.cost << std::endl;
+    // show_cost(s, data);
 
     return s;
 }
@@ -401,11 +490,10 @@ int main(int argc, char** argv) {
 
     std::cout << "Dimension: " << n << endl;
 
-    Solution s = Construction(data);
 
     /*std::cout << "DistanceMatrix: " << endl;
     data.printMatrixDist();*/
-/*
+
     int max_iter_ils;
     if (n >= 150){
         max_iter_ils = n/2;
@@ -419,7 +507,8 @@ int main(int argc, char** argv) {
     show_sequence(s);
     std::cout << s.cost << std::endl;
     show_cost(s, data);
-    */
+
+    
 /*
     Solution s = Construction(data);
 
@@ -427,11 +516,12 @@ int main(int argc, char** argv) {
     std::cout << s.cost << std::endl;
     show_cost(s, data);
 
-    s = Perturbation(s, data);
+    best_improvement_swap(s, data);
 
     show_sequence(s);
     std::cout << s.cost << std::endl;
-    show_cost(s, data);*/
+    show_cost(s, data);
+*/
 
     /*
     Solution s = Construction(data);
