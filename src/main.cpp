@@ -7,15 +7,15 @@
 
 typedef struct Solution
 {
-    std::vector<int> sequence;
-    double cost;
+    std::vector<int> sequence = {0,0};
+    double cost = 0.0;
 } Solution;
 
 typedef struct Insertion_info
 {
-    int inserted_node;
-    int removed_edge;
-    double cost;
+    int inserted_node = 0;
+    int removed_edge = 0;
+    double cost = 0.0;
 } Insertion_info;
 
 std::vector<Insertion_info> Insertion_cost_calculator(Solution &s, std::vector<int> &CL, Data &data){
@@ -116,7 +116,7 @@ Solution Construction(Data &data){
     return s;
 }
 
-bool check_delta(Solution &s, Data &data, int move, int i, int j, double delta, int size_block){
+double check_delta(Solution &s, Data &data, int move, int i, int j, double delta, int size_block){
     Solution a = s;
     double cost = 0;
 
@@ -127,7 +127,7 @@ bool check_delta(Solution &s, Data &data, int move, int i, int j, double delta, 
             cost += data.getDistance(a.sequence[k], a.sequence[k+1]);
         }
         double real_delta = cost - a.cost;
-        return real_delta == delta;
+        return real_delta - delta;
         break;
     }
     case 2:{
@@ -136,7 +136,7 @@ bool check_delta(Solution &s, Data &data, int move, int i, int j, double delta, 
             cost += data.getDistance(a.sequence[k], a.sequence[k+1]);
         }
         double real_delta = cost - a.cost;
-        return real_delta == delta;
+        return real_delta - delta;
         break;
     }
     case 3:{
@@ -164,11 +164,11 @@ bool check_delta(Solution &s, Data &data, int move, int i, int j, double delta, 
             cost += data.getDistance(a.sequence[k], a.sequence[k+1]);
         }
         double real_delta = cost - a.cost;
-        return real_delta == delta;
+        return real_delta - delta;
         break;
     }
     default:
-        return false;
+        return 0.0;
     }
 }
 
@@ -218,7 +218,7 @@ bool best_improvement_swap(Solution &s, Data &data){
                 );
             }
 
-            std::cout << "SWAP: " << check_delta(s, data, 1, i, j, delta, 0) << " ";
+            // std::cout << "SWAP: " << check_delta(s, data, 1, i, j, delta, 0) << " ";
             /*
             std::cout << "\nprev_vi: " << vi_prev << "\nvi: " << vi << "\nvi_next: " << vi_next;
             std::cout << "\nprev_vj: " << vj_prev << "\nvj: " << vj << "\nvj_next: " << vj_next;
@@ -280,7 +280,7 @@ bool best_improvement_2opt(Solution &s, Data &data){
                 );
             }
 
-            std::cout << "2-OPT: " << check_delta(s, data, 2, i, j, delta, 0) << " ";
+            // std::cout << "2-OPT: " << check_delta(s, data, 2, i, j, delta, 0) << " ";
 
             // std::cout << "\nDelta calculado (2opt): " << delta << std::endl;
 
@@ -342,7 +342,7 @@ bool best_improvement_oropt(Solution &s, Data &data, int size_block){
                     data.getDistance(vi_prev, vi)
                 );
 
-                std::cout << "OR-OPT: " << check_delta(s, data, 3, i, j, delta, size_block) << " ";
+                // std::cout << "OR-OPT: " << check_delta(s, data, 3, i, j, delta, size_block) << " ";
 
                 // std::cout << "\nDelta calculado (oropt): " << delta << std::endl;
 
@@ -605,10 +605,10 @@ int main(int argc, char** argv) {
 
     // best_improvement_swap(s, data);
 
-    std::cout << std::endl;
-    show_sequence(s);
-    std::cout << s.cost << std::endl;
-    show_cost(s, data);
+    // std::cout << std::endl;
+    // show_sequence(s);
+    // std::cout << s.cost << std::endl;
+    // show_cost(s, data);
 
     return 0;
 }
