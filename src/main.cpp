@@ -458,9 +458,16 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
     Solution best_of_all;
     best_of_all.cost = INFINITY;
 
+    // std::cout << "max_iter_ils: " << max_iter_ils << std::endl;
+
     for(int i = 0; i < max_iter; i++){
         Solution s = Construction(data);
         Solution best = s;
+
+        // std::cout << "best = s (ILS - Construction): ";
+        // show_sequence(best);
+        // std::cout << best.cost << std::endl;
+        // show_cost(best, data);
 
         int iter_ils = 0;
 
@@ -471,11 +478,33 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
                 best = s;
                 iter_ils = 0;
             }
+
+            // std::cout << "s (ILS - Local Search): ";
+            // show_sequence(s);
+            // std::cout << s.cost << std::endl;
+            // show_cost(s, data);
+            // std::cout << "s.sequence (ILS - Local Search): ";
+            // std::cout << "iter_ils: " << iter_ils << std::endl;
+
             s = Perturbation(best, data);
             iter_ils++;
+
+            // std::cout << "best.sequence (ILS - Perturbation): ";
+            // show_sequence(best);
+            // std::cout << best.cost << std::endl;
+            // show_cost(best, data);
+            // std::cout << "iter_ils: " << iter_ils << std::endl;
+
         }
         if (best.cost < best_of_all.cost){
             best_of_all = best;
+
+            // std::cout << "best_of_all.sequence (ILS - Perturbation): ";
+            // show_sequence(best_of_all);
+            // std::cout << best_of_all.cost << std::endl;
+            // show_cost(best_of_all, data);
+            // std::cout << "iter_ils: " << iter_ils << std::endl;
+
         }
     }
     return best_of_all;
