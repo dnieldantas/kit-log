@@ -172,6 +172,10 @@ double check_delta(Solution &s, Data &data, int move, int i, int j, double delta
     }
 }
 
+void check_movements(Solution &s, Data &data, string move, int i, int j){   
+    std::cout << "(" << move << ") " << "i: " << i << " j: " << j << "\n";
+}
+
 bool best_improvement_swap(Solution &s, Data &data){
     double best_delta = 0;
     int best_i = 0;
@@ -191,6 +195,7 @@ bool best_improvement_swap(Solution &s, Data &data){
 
             // std::cout << "Vértices j (swap):\n";
             // std::cout << vj_prev << " " << vj << " " << vj_next << "\n";
+            // check_movements(s, data, "SWAP", i, j);
 
             double delta = 0;
 
@@ -267,6 +272,7 @@ bool best_improvement_2opt(Solution &s, Data &data){
 
             // std::cout << "Vértices j (2opt):\n";
             // std::cout << vj << " " << vj_next << "\n";
+            // check_movements(s, data, "2-OPT", i, j);
 
             double delta = 0;
 
@@ -328,6 +334,7 @@ bool best_improvement_oropt(Solution &s, Data &data, int size_block){
 
             // std::cout << "Vértices j (oropt):\n";
             // std::cout << vj << " " << vi_next << "\n";
+            // check_movements(s, data, "OR-OPT", i, j);
 
             double delta = 0;
 
@@ -604,6 +611,10 @@ int main(int argc, char** argv) {
     // show_cost(s, data);
 
     // best_improvement_swap(s, data);
+    // best_improvement_2opt(s, data);
+    // best_improvement_oropt(s, data, 1);
+    // best_improvement_oropt(s, data, 2);
+    // best_improvement_oropt(s, data, 3);
 
     // std::cout << std::endl;
     // show_sequence(s);
