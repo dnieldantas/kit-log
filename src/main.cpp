@@ -524,6 +524,71 @@ Solution Perturbation(Solution &a, Data &data){
     return s;
 }
 
+Solution Perturbation2(Solution &a, Data &data){
+    Solution s = a;
+    
+    int max_size = (int) std::ceil((s.sequence.size()-1)/10.0);
+
+    // std::cout << "max_size (perturbation): " << max_size << std::endl;
+
+    int size_block_i = rand_range(2, max_size);
+    int size_block_j = rand_range(2, max_size);
+
+    // std::cout << "size_block_i: " << size_block_i << "\nsize_block_j: " << size_block_j << "\n";
+
+    int first_i = rand_range(1, (s.sequence.size()-2)-(size_block_i-1)-(size_block_j));
+    int last_i = first_i+size_block_i-1;
+
+    // std::cout << "first_i: " << first_i << "\nlast_i: " << last_i << "\n";
+    
+    int first_j = rand_range(last_i+1, (s.sequence.size()-2)-(size_block_j-1));
+    int last_j = first_j+size_block_j-1;
+
+    // std::cout << "first_j: " << first_j << "\nlast_j: " << last_j << "\n";
+
+    // std::cout << "\nDelta calculado (perturbation): " << delta << std::endl;
+
+    std::vector<int> block_i(s.sequence.begin() + first_i, s.sequence.begin() + last_i+1);
+    std::vector<int> block_j(s.sequence.begin() + first_j, s.sequence.begin() + last_j+1);
+
+    // std::cout << "block_i: ";
+    // for (int i : block_i){
+    //     std::cout << i << " ";
+    // }
+    // std::cout << std::endl;
+
+    // std::cout << "block_j: ";
+    // for (int j : block_j){
+    //     std::cout << j << " ";
+    // }
+    // std::cout << std::endl;
+
+    s.sequence.erase(s.sequence.begin()+first_j, s.sequence.begin()+last_j+1);
+    s.sequence.erase(s.sequence.begin()+first_i, s.sequence.begin()+last_i+1);
+
+    // std::cout << "sequence after erase (perturbation): ";
+    // show_sequence(s);
+
+    s.sequence.insert(s.sequence.begin()+first_j-size_block_i, block_i.begin(), block_i.end());
+    s.sequence.insert(s.sequence.begin()+first_i, block_j.begin(), block_j.end());
+
+    // std::cout << "sequence after insertion (perturbation): ";
+    // show_sequence(s);
+    double cost = 0;
+
+    for (int i = 0; i < s.sequence.size()-1; i++){
+        cost += data.getDistance(s.sequence[i], s.sequence[i+1]);
+    }
+
+    s.cost = cost;
+
+    // show_sequence(s);
+    // std::cout << s.cost << std::endl;
+    // show_cost(s, data);
+
+    return s;
+}
+
 
 Solution ILS(int max_iter, int max_iter_ils, Data &data){
     Solution best_of_all;
@@ -557,7 +622,7 @@ Solution ILS(int max_iter, int max_iter_ils, Data &data){
             // std::cout << "s.sequence (ILS - Local Search): ";
             // std::cout << "iter_ils: " << iter_ils << std::endl;
 
-            s = Perturbation(best, data);
+            s = Perturbation2(best, data);
             iter_ils++;
 
             // std::cout << "best.sequence (ILS - Perturbation): ";
@@ -600,9 +665,21 @@ int main(int argc, char** argv) {
 
     Solution s = ILS(50, max_iter_ils, data);
 
+    // Solution s = Construction(data);
+    // Solution a = s;
+
+    // show_sequence(s);
+
+    // s = Perturbation(s, data);
+    // a = Perturbation2(a, data);
+
     show_sequence(s);
     std::cout << s.cost << std::endl;
     show_cost(s, data); 
+
+    // show_sequence(a);
+    // std::cout << a.cost << std::endl;
+    // show_cost(a, data); 
 
     // Solution s = Construction(data);
 
