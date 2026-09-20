@@ -2,7 +2,7 @@
 
 mkdir -p resultados
 
-echo "instancia,execucao1,execucao2,execucao3,execucao4,execucao5,execucao6,execucao7,execucao8,execucao9,execucao10,custo_medio" > resultados/resultados.csv
+echo "instancia,execucao1,execucao2,execucao3,execucao4,execucao5,execucao6,execucao7,execucao8,execucao9,execucao10,custo_medio" > resultados/resultados3.csv
 
 instancias=(
     "a280"
@@ -95,18 +95,18 @@ do
 
     media=$(echo "scale=6; $soma / 10" | bc)
 
-    echo -n "$nome" >> resultados/resultados.csv
+    echo -n "$nome" >> resultados/resultados3.csv
 
     for custo in "${custos[@]}"
     do
-        echo -n ",$custo" >> resultados/resultados.csv
+        echo -n ",$custo" >> resultados/resultados3.csv
     done
 
-    echo ",$media" >> resultados/resultados.csv
+    echo ",$media" >> resultados/resultados3.csv
 
     echo "  Custo médio: $media"
 done
 
 echo ""
 echo "Experimentos concluídos!"
-echo "Resultado salvo em resultados/resultados.csv"
+echo "Resultado salvo em resultados/resultados3.csv"

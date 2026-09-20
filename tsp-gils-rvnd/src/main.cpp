@@ -37,17 +37,22 @@ std::vector<Insertion_info> Insertion_cost_calculator(Solution &s, std::vector<i
 void random_nodes(Solution &s, Data &data){
     while(s.sequence.size() < 5){
         int num = rand() % data.getDimension();
+
         if (std::find(s.sequence.begin(), s.sequence.end(), num) == s.sequence.end()){
-            s.sequence.insert(s.sequence.begin()+1, num);
+            int last = s.sequence[0];
+            int next = s.sequence[1];
+
+            s.cost -= data.getDistance(last, next);
+
+            s.sequence.insert(s.sequence.begin() + 1, num);
+
+            s.cost += data.getDistance(last, num);
+            s.cost += data.getDistance(num, next);
         }
-    }
-    // da p melhorar
-    for (int i = 0; i < s.sequence.size()-1; i++){
-        s.cost += data.getDistance(s.sequence[i], s.sequence[i+1]);
     }
 }
 
-std::vector<int> nodes_left(std::vector<int> sequence, Data &data){ // dá p melhorar isso aq
+std::vector<int> nodes_left(std::vector<int> sequence, Data &data){
     std::vector<int> CL;
     for (int i = 0; i < data.getDimension(); i++){
         if (std::find(sequence.begin(), sequence.end(), i) == sequence.end()){
@@ -97,7 +102,10 @@ Solution Construction(Data &data){
     while (!CL.empty()){
         std::vector<Insertion_info> insertion_cost = Insertion_cost_calculator(s, CL, data);
         std::sort(insertion_cost.begin(), insertion_cost.end(), [](Insertion_info &a, Insertion_info &b){return a.cost < b.cost;});
-        double alpha = (double) rand() / RAND_MAX;
+        double alpha;
+        do {
+            alpha = (double) rand() / RAND_MAX;
+        } while (alpha == 0.0);
         int selected = rand() % ((int) ceil(alpha * insertion_cost.size()));
         insert_solution(s, insertion_cost[selected]);
         
